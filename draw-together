@@ -1,0 +1,190 @@
+#!/bin/bash
+set -e
+
+command -v docker &>/dev/null || { echo "Docker required. See https://docs.docker.com/get-docker/"; exit 1; }
+command -v openssl &>/dev/null || { echo "OpenSSL required. See https://wiki.openssl.org/index.php/Binaries"; exit 1; }
+
+# Bake options
+BAKE_FILE_PATH="./docker-bake.hcl"
+
+BAKE_TARGET_PROD="prod"
+BAKE_CONFIG_PROD="./.env"
+
+BAKE_TARGET_DEV="dev"
+BAKE_CONFIG_DEV="./.env.dev"
+
+JWT_PUBLIC_KEY=$(openssl rand -hex 64)
+export JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+
+# Docker compose options
+COMPOSE_FILE_PATH="./docker-compose.yaml"
+COMPOSE_FILE_PATH_DEV="./docker-compose.local.yaml"
+
+# CLI options
+OPT_BUILD=false
+OPT_CC=false
+OPT_DEV=false
+OPT_ENV=false
+OPT_PRINT=false
+OPT_RUN=false
+OPT_PRINT=false
+
+OPT_HELP="Command line tool to help build and run the application.
+
+Usage:
+
+    $0 [-abcdeprh]
+
+Options:
+
+    -b  Build the application, but don't run it.
+        This is the default option.
+    -c  Clear cache during build.
+    -d  Build and run the application in development mode.
+    -e  Setup .env file if they do not exists.
+        Will create a .env and .env.dev for production and
+        development builds.
+    -p  Print the Bake options without building.
+    -r  Build and run the application in production mode.
+    -h  Show help text."
+
+
+while getopts ":abcdeprh" name
+do
+    case $name in
+    b)
+        OPT_BUILD=true
+        ;;
+    c)
+        OPT_CC=true
+        ;;
+    d)
+        OPT_DEV=true
+        ;;
+    e)
+        OPT_ENV=true
+        ;;
+    p)
+        OPT_BUILD=true
+        OPT_PRINT=true
+        ;;
+    r)
+        OPT_BUILD=true
+        OPT_RUN=true
+        ;;
+    h)
+        echo "$OPT_HELP"
+        exit 0
+        ;;
+    *)
+        echo "Invalid option: -$OPTARG"
+        echo "$OPT_HELP"
+        exit 0
+        ;;
+    esac
+done
+
+if [[ "$OPTIND" -eq 1 ]]; then
+    OPT_BUILD=true # Set default option
+fi
+
+BAKE_OPTS=""
+
+function build() {
+    rm -rf log
+
+    BAKE_OPTS+=" --file $BAKE_FILE_PATH"
+    BAKE_OPTS+=" --file $BAKE_CONFIG_PROD"
+
+    GITBRANCH=$(git rev-parse --abbrev-ref HEAD || echo "git_branch_not_set")
+    GITCOMMIT=$(git rev-parse HEAD || echo "git_commit_not_set")
+    GITSHORT=$(git rev-parse --short HEAD || echo "git_short_not_set")
+
+    BAKE_OPTS+=" --set vcsargs.args.GITBRANCH=$GITBRANCH"
+    BAKE_OPTS+=" --set vcsargs.args.GITCOMMIT=$GITCOMMIT"
+    BAKE_OPTS+=" --set vcsargs.args.GITSHORT=$GITSHORT"
+
+    if [ "$OPT_CC" = true ]; then
+        BAKE_OPTS+=" --no-cache"
+    fi
+
+    BAKE_PRINT=""
+
+    if [ "$OPT_PRINT" = true ]; then
+        BAKE_PRINT=" --print"
+    fi
+
+    if [ "$OPT_DEV" = true ]; then
+        mkdir -p log
+        BAKE_OPTS+=" --file $BAKE_CONFIG_DEV"
+        BAKE_OPTS+=" --metadata-file ./log/build.$BAKE_TARGET_DEV.meta"
+        BAKE_OPTS+="$BAKE_PRINT $BAKE_TARGET_DEV"
+    else
+        BAKE_OPTS+="$BAKE_PRINT $BAKE_TARGET_PROD"
+    fi
+
+    if [ "$OPT_PRINT" = false ]; then
+        docker compose down
+        docker buildx bake $BAKE_OPTS
+        docker image prune -f
+    else
+        docker buildx bake $BAKE_OPTS
+    fi
+}
+
+COMPOSE_OPTS=""
+
+function run() {
+    source $BAKE_CONFIG_PROD
+    source $BAKE_CONFIG_DEV
+
+    COMPOSE_OPTS+=" -f docker-compose.yaml"
+    COMPOSE_OPTS+=" --env-file $BAKE_CONFIG_PROD"
+    
+    if [ "$OPT_DEV" = true ]; then
+        COMPOSE_OPTS+=" -f docker-compose.dev.yaml"
+        COMPOSE_OPTS+=" --env-file $BAKE_CONFIG_DEV"
+    fi
+    
+    if [ "$OPT_PRINT" = false ]; then
+        docker compose $COMPOSE_OPTS up
+    else
+        docker compose $COMPOSE_OPTS config
+    fi
+}
+
+function setup_env() {
+    ENV_PATH="./.env.test"
+    ENV_PATH_DEV="./.env.dev.test"
+
+    if [ ! -f $ENV_PATH ]; then
+        cp .env.example $ENV_PATH
+        echo "$ENV_PATH created."
+    else
+        echo "no action: $ENV_PATH file already exists."
+    fi
+
+    if [ ! -f $ENV_PATH_DEV ]; then
+        echo "# UI Service development override
+SERVICE_UI_PORT=5173
+SERVICE_UI_REPLICAS=1
+SERVICE_WEBSOCKET_REPLICAS=1
+SERVICE_GRPC_PORT=9443
+SERVICE_GRPC_REPLICAS=1" >> $ENV_PATH_DEV
+        echo "$ENV_PATH_DEV created."
+    else
+        echo "no action: $ENV_PATH_DEV file already exists."
+    fi
+}
+
+if [ "$OPT_ENV" = true ]; then
+    setup_env
+fi
+
+if [ "$OPT_BUILD" = true ]; then
+    build
+fi
+
+if [ "$OPT_RUN" = true ]; then
+    run
+fi

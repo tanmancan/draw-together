@@ -1,0 +1,63 @@
+resources:
+  - "@type": type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: %SERVICE_GRPC%
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    typed_extension_protocol_options:
+      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+        "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+        explicit_http_config:
+          http2_protocol_options: {}
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: %SERVICE_GRPC%
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: %SERVICE_GRPC%
+                    port_value: %SERVICE_GRPC_PORT%
+    transport_socket:
+      name: envoy.transport_sockets.tls
+      typed_config:
+        "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+
+  - "@type": type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: %SERVICE_WEBSOCKET%
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: %SERVICE_WEBSOCKET%
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: %SERVICE_WEBSOCKET%
+                    port_value: %SERVICE_WEBSOCKET_PORT%
+    transport_socket:
+      name: envoy.transport_sockets.tls
+      typed_config:
+        "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+
+  - "@type": type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: %SERVICE_UI%
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: %SERVICE_UI%
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                health_check_config:
+                  hostname: %SERVICE_UI%
+                  port_value: %SERVICE_UI_PORT%
+                address:
+                  socket_address:
+                    address: %SERVICE_UI%
+                    port_value: %SERVICE_UI_PORT%
+    transport_socket:
+      name: envoy.transport_sockets.tls
+      typed_config:
+        "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext

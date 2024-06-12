@@ -1,0 +1,46 @@
+services:
+  redis:
+    ports:
+      - 6379:6379
+      
+  ui:
+    image: ${APP_NAMESPACE}/uidev:${APP_VERSION}
+    volumes:
+      - ./ui/src/:/app/src/.
+    ports:
+      - ${SERVICE_UI_PORT}:${SERVICE_UI_PORT}
+
+  websocket:
+    image: ${APP_NAMESPACE}/websocketdev:${APP_VERSION}
+    volumes:
+      - ./cmd/rpc/:/app/cmd/rpc/.
+      - ./internal/:/app/internal/.
+    ports:
+      - ${SERVICE_WEBSOCKET_PORT}:${SERVICE_WEBSOCKET_PORT}
+
+  rpc:
+    image: ${APP_NAMESPACE}/rpcdev:${APP_VERSION}
+    volumes:
+      - ./cmd/rpc/:/app/cmd/rpc/.
+      - ./internal/:/app/internal/.
+    ports:
+      - ${SERVICE_GRPC_PORT}:${SERVICE_GRPC_PORT}
+
+  detect:
+    image: ${APP_NAMESPACE}/detectdev:${APP_VERSION}
+    volumes:
+      - ./cmd/detect/:/app/cmd/detect/.
+      - ./internal/:/app/internal/.
+  
+  protobuild:
+    image: ${APP_NAMESPACE}/protobuilddev:${APP_VERSION}
+    volumes:
+      - ./internal/model:/app/internal/model/.
+      - ./internal/service:/app/internal/service/.
+      - ./proto:/app/proto
+
+  prototsbuild:
+    image: ${APP_NAMESPACE}/prototsbuilddev:${APP_VERSION}
+    volumes:
+      - ./ui/src/proto-ts:/app/ui/src/proto-ts/.
+      - ./proto:/app/proto

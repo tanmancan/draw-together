@@ -1,0 +1,13 @@
+node:
+  cluster: draw-together-local-cluster
+  id: draw-together-local
+
+admin: { address: { socket_address: { address: 0.0.0.0, port_value: 9901 } } }
+
+dynamic_resources:
+  cds_config:
+    resource_api_version: V3
+    path: /etc/envoy/cds-tls.yaml
+  lds_config:
+    resource_api_version: V3
+    path: /etc/envoy/lds-tls.yaml

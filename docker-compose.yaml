@@ -1,0 +1,91 @@
+name: draw-together
+
+services:
+  envoy:
+    restart: always
+    image: ${APP_NAMESPACE}/${SERVICE_ENVOY}:${APP_VERSION}
+    depends_on:
+      - rpc
+      - websocket
+      - ui
+    ports:
+      - ${ENVOY_ADMIN_PORT}:${ENVOY_ADMIN_PORT}
+      - ${ENVOY_PUBLIC_PORT}:${ENVOY_PUBLIC_PORT}
+
+  ui:
+    image: ${APP_NAMESPACE}/${SERVICE_UI}:${APP_VERSION}
+    deploy:
+      mode: replicated
+      replicas: ${SERVICE_UI_REPLICAS}
+      endpoint_mode: vip
+      # resources:
+      #   limits:
+      #     cpus: '0.50'
+      #     memory: 50M
+      #   reservations:
+      #     cpus: '0.25'
+      #     memory: 25M
+        
+  redis:
+    restart: always
+    image: ${APP_NAMESPACE}/${SERVICE_REDIS}:${APP_VERSION}
+    deploy:
+      # resources:
+      #   limits:
+      #     cpus: '0.50'
+      #     memory: 150M
+      #   reservations:
+      #     cpus: '0.25'
+      #     memory: 100M
+  
+  websocket:
+    image: ${APP_NAMESPACE}/${SERVICE_WEBSOCKET}:${APP_VERSION}
+    depends_on:
+      - redis
+    deploy:
+      mode: replicated
+      replicas: ${SERVICE_WEBSOCKET_REPLICAS}
+      endpoint_mode: dnsrr
+      # resources:
+      #   limits:
+      #     cpus: '0.50'
+      #     memory: 50M
+      #   reservations:
+      #     cpus: '0.25'
+      #     memory: 20M
+    environment:
+      - SERVICE_REDIS=${SERVICE_REDIS}
+      - SERVICE_WEBSOCKET_HOST=${SERVICE_WEBSOCKET_HOST}
+      - SERVICE_WEBSOCKET_PORT=${SERVICE_WEBSOCKET_PORT}
+      - CORS_ALLOWED_ORIGIN=${CORS_ALLOWED_ORIGIN}
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+
+  rpc:
+    image: ${APP_NAMESPACE}/${SERVICE_GRPC}:${APP_VERSION}
+    depends_on:
+      - redis
+    environment:
+      - SERVICE_REDIS=${SERVICE_REDIS}
+      - SERVICE_GRPC_HOST=${SERVICE_GRPC_HOST}
+      - SERVICE_GRPC_PORT=${SERVICE_GRPC_PORT}
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+    deploy:
+      mode: replicated
+      replicas: ${SERVICE_GRPC_REPLICAS}
+      # resources:
+      #   limits:
+      #     cpus: '0.50'
+      #     memory: 50M
+      #   reservations:
+      #     cpus: '0.25'
+      #     memory: 20M
+  
+  detect:
+    image: ${APP_NAMESPACE}/${SERVICE_DETECT}:${APP_VERSION}
+    depends_on:
+      - redis
+    environment:
+      - SERVICE_REDIS=${SERVICE_REDIS}
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+      - AZURE_CV_ENDPOINT=${AZURE_CV_ENDPOINT}
+      - AZURE_CV_KEY=${AZURE_CV_KEY}

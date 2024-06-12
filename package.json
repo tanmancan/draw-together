@@ -1,0 +1,13 @@
+{
+  "name": "generate-proto-ts",
+  "author": {
+    "name": "Tanveer Karim",
+    "email": "contact@tkarimdesign.com"
+  },
+  "scripts": {
+    "protoc:ts": "protoc --ts_out ui/src/proto-ts --ts_opt ts_nocheck --proto_path . proto/model/*.proto proto/*.proto"
+  },
+  "devDependencies": {
+    "@protobuf-ts/plugin": "^2.9.4"
+  }
+}

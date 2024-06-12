@@ -1,0 +1,22 @@
+**/node_modules/
+node_modules
+ui/node_modules
+**/dist
+.git
+npm-debug.log
+.coverage
+.coverage.*
+.env
+.aws
+
+# Builds
+bin
+# tmp
+
+*.debug
+debug
+etc
+
+# Secrets
+secrets
+*.pem
