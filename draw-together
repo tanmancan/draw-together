@@ -147,7 +147,7 @@ function run() {
     fi
     
     if [ "$OPT_PRINT" = false ]; then
-        docker compose $COMPOSE_OPTS up
+        docker compose $COMPOSE_OPTS up --detach
     else
         docker compose $COMPOSE_OPTS config
     fi

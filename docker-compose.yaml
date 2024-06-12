@@ -18,25 +18,25 @@ services:
       mode: replicated
       replicas: ${SERVICE_UI_REPLICAS}
       endpoint_mode: vip
-      # resources:
-      #   limits:
-      #     cpus: '0.50'
-      #     memory: 50M
-      #   reservations:
-      #     cpus: '0.25'
-      #     memory: 25M
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 25M
         
   redis:
     restart: always
     image: ${APP_NAMESPACE}/${SERVICE_REDIS}:${APP_VERSION}
     deploy:
-      # resources:
-      #   limits:
-      #     cpus: '0.50'
-      #     memory: 150M
-      #   reservations:
-      #     cpus: '0.25'
-      #     memory: 100M
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
   
   websocket:
     image: ${APP_NAMESPACE}/${SERVICE_WEBSOCKET}:${APP_VERSION}
@@ -46,13 +46,13 @@ services:
       mode: replicated
       replicas: ${SERVICE_WEBSOCKET_REPLICAS}
       endpoint_mode: dnsrr
-      # resources:
-      #   limits:
-      #     cpus: '0.50'
-      #     memory: 50M
-      #   reservations:
-      #     cpus: '0.25'
-      #     memory: 20M
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     environment:
       - SERVICE_REDIS=${SERVICE_REDIS}
       - SERVICE_WEBSOCKET_HOST=${SERVICE_WEBSOCKET_HOST}
@@ -72,13 +72,13 @@ services:
     deploy:
       mode: replicated
       replicas: ${SERVICE_GRPC_REPLICAS}
-      # resources:
-      #   limits:
-      #     cpus: '0.50'
-      #     memory: 50M
-      #   reservations:
-      #     cpus: '0.25'
-      #     memory: 20M
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
   
   detect:
     image: ${APP_NAMESPACE}/${SERVICE_DETECT}:${APP_VERSION}
