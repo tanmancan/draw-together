@@ -42,6 +42,7 @@ target "appargs" {
     APP_VERSION   = APP_VERSION
     BUILD_TIME    = timestamp()
   }
+  output = ["type=registry"]
 }
 
 target "vcsargs" {
@@ -73,9 +74,8 @@ target "gobase" {
   contexts = {
     "${SERVICE_PROTOBASE}" = "target:${SERVICE_PROTOBASE}"
   }
-  dockerfile      = "build/base/${SERVICE_GOBASE}/Dockerfile"
-  no-cahce-filter = ["buildrpc", "buildwebsocket"]
-  args            = {}
+  dockerfile = "build/base/${SERVICE_GOBASE}/Dockerfile"
+  args       = {}
 }
 
 target "uibase" {
