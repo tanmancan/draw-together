@@ -69,7 +69,6 @@ do
         OPT_PRINT=true
         ;;
     r)
-        OPT_BUILD=true
         OPT_RUN=true
         ;;
     h)

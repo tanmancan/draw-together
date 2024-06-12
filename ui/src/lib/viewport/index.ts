@@ -10,6 +10,15 @@ export const BASE_VIEWPORT_HEIGHT = 512;
 export const BASE_STROKE_WIDTH = 5;
 export const BASE_STROKE_STYLE = "#000";
 
+const EV_MOUSE_UP = "mouseup";
+const EV_MOUSE_MOVE = "mousemove";
+const EV_TOUCH_END = "touchend";
+const EV_TOUCH_MOVE = "touchmove";
+
+const isMouseEv = (ev: MouseEvent | TouchEvent): ev is MouseEvent => {
+  return ev.type == EV_MOUSE_MOVE || ev.type == EV_MOUSE_UP;
+};
+
 export class ViewPort {
   protected primaryCanvas: HTMLCanvasElement | null = null;
   protected primaryCtx: CanvasRenderingContext2D | null = null;
@@ -135,13 +144,19 @@ export class ViewPort {
   }
 
   protected initEvent() {
-    document?.addEventListener("mouseup", this.onMouseUp);
-    this.primaryCanvas?.addEventListener("mousemove", this.onMouseMove);
+    document?.addEventListener(EV_MOUSE_UP, this.onMouseUp);
+    this.primaryCanvas?.addEventListener(EV_MOUSE_MOVE, this.onMouseMove);
+
+    document?.addEventListener(EV_TOUCH_END, this.onMouseUp);
+    this.primaryCanvas?.addEventListener(EV_TOUCH_MOVE, this.onMouseMove);
   }
 
   protected removeEvent() {
-    document?.removeEventListener("mouseup", this.onMouseUp);
-    this.primaryCanvas?.removeEventListener("mousemove", this.onMouseMove);
+    document?.removeEventListener(EV_MOUSE_UP, this.onMouseUp);
+    this.primaryCanvas?.removeEventListener(EV_MOUSE_MOVE, this.onMouseMove);
+
+    document?.removeEventListener(EV_TOUCH_END, this.onMouseUp);
+    this.primaryCanvas?.removeEventListener(EV_TOUCH_MOVE, this.onMouseMove);
   }
 
   protected getCurrentUserCanvas() {
@@ -316,10 +331,17 @@ export class ViewPort {
     }
   }
 
-  protected onMouseMove(e: MouseEvent) {
-    this.offsetX = e.offsetX;
-    this.offsetY = e.offsetY;
-    this.mouseDown = e.buttons > 0 && this.mouseIsBound;
+  protected onMouseMove(e: MouseEvent | TouchEvent) {
+    if (isMouseEv(e)) {
+      this.offsetX = e.offsetX;
+      this.offsetY = e.offsetY;
+      this.mouseDown = e.buttons > 0 && this.mouseIsBound;
+    } else {
+      const rect = this.primaryCanvas?.getBoundingClientRect();
+      this.offsetX = e.touches[0].clientX - (rect?.left ?? 0);
+      this.offsetY = e.touches[0].clientY - (rect?.top ?? 0);
+      this.mouseDown = e.type == EV_TOUCH_MOVE;
+    }
   }
 
   protected get canvasAspect(): number {

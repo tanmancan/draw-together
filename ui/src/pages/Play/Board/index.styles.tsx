@@ -15,6 +15,9 @@ export const StyledWrapper = styled("div", {
   width: `100vw`,
   height: `100vh`,
   overflow: "hidden",
+  "@media (max-width: 768px)": {
+    gridTemplateColumns: `1fr 1fr 1fr 0px`,
+  },
 });
 
 export const StyledViewPortArea = styled("div", {
@@ -42,6 +45,13 @@ export const StyledSideBarArea = styled("div", {
   padding: 16,
   borderLeft: `1px solid var(--gray-5)`,
   overflowY: "scroll",
+  "@media (max-width: 768px)": {
+    gridArea: "viewport",
+    zIndex: -1,
+    "& .mobile-show": {
+      zIndex: 1,
+    },
+  },
 });
 
 export const StyledViewPort = styled("canvas", {
