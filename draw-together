@@ -154,8 +154,8 @@ function run() {
 }
 
 function setup_env() {
-    ENV_PATH="./.env.test"
-    ENV_PATH_DEV="./.env.dev.test"
+    ENV_PATH="./.env"
+    ENV_PATH_DEV="./.env.dev"
 
     if [ ! -f $ENV_PATH ]; then
         cp .env.example $ENV_PATH
