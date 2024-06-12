@@ -1,0 +1,23 @@
+syntax = "proto3";
+package model;
+
+import "proto/model/board.proto";
+import "proto/model/chat.proto";
+import "proto/model/drawing.proto";
+import "proto/model/pointer.proto";
+import "proto/model/user.proto";
+
+option go_package = "github.com/tanmancan/draw-together/internal/model";
+
+message WsEvent {
+    string req_id = 1;
+    oneof event {
+        EventChatMessage chat_message = 2;
+        EventPointerUpdate pointer_update = 3;
+        EventBoardUpdate board_update = 4;
+        EventDrawingUpdate drawing_update = 5;
+        EventUserUpdate user_update = 6;
+        EventDrawingDetect drawing_detect = 7;
+        EventDrawingDetectQueue drawing_detect_queue = 8;
+    }
+}

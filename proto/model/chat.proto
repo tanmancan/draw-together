@@ -1,0 +1,31 @@
+syntax = "proto3";
+package model;
+
+import "proto/model/common.proto";
+
+option go_package = "github.com/tanmancan/draw-together/internal/model";
+
+// A single message event
+message EventChatMessage {
+    EventMetadata metadata = 1;
+    string body = 2;
+}
+
+message ChatMessageRequest {
+    UUID board_id = 1;
+    // List of one or more batched messages
+    repeated string message = 2;
+}
+
+message ChatMessageResponse {
+    bool success = 1;
+}
+
+// Get all board messages
+message GetBoardMessagesRequest {
+    UUID board_id = 1;
+}
+
+message GetBoardMessagesResponse {
+    repeated EventChatMessage messages = 1;
+}

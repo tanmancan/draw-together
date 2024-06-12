@@ -1,0 +1,36 @@
+syntax = "proto3";
+package service;
+
+import "proto/model/board.proto";
+import "proto/model/chat.proto";
+import "proto/model/drawing.proto";
+import "proto/model/pointer.proto";
+import "proto/model/user.proto";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/tanmancan/draw-together/internal/service";
+
+service UserService {
+    rpc CreateUser(model.CreateUserRequest) returns (model.CreateUserResponse) {};
+    rpc GetUser(google.protobuf.Empty) returns (model.GetUserResponse) {};
+    rpc DeleteUser(google.protobuf.Empty) returns (model.GetUserResponse) {}
+} 
+ 
+service BoardService {
+    rpc CreateBoard(model.CreateBoardRequest) returns (model.GetBoardResponse) {};
+    rpc GetBoard(model.GetBoardRequest) returns (model.GetBoardResponse) {};
+    rpc DeleteBoard(model.GetBoardRequest) returns (model.GetBoardResponse) {};
+    rpc UpdateDrawing(model.UpdateDrawingRequest) returns (model.UpdateDrawingResponse) {};
+    rpc GetBoardDrawings(model.GetBoardDrawingsRequest) returns (model.GetBoardDrawingsResponse) {};
+    rpc DrawingDetect(model.GetBoardDrawingsRequest) returns (model.DrawingDetectResponse) {};
+}
+
+service ChatService {
+    rpc SendMessage(model.ChatMessageRequest) returns (model.ChatMessageResponse) {};
+    rpc GetBoardMessages(model.GetBoardMessagesRequest) returns (model.GetBoardMessagesResponse) {};
+}
+
+service PointerService {
+    rpc UpdatePointer(model.UpdatePointerRequest) returns (model.UpdatePointerResponse) {};
+}

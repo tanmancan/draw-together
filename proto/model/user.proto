@@ -1,0 +1,36 @@
+syntax = "proto3";
+package model;
+
+import "proto/model/common.proto";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/tanmancan/draw-together/internal/model";
+
+message User {
+    UUID id = 1;
+    string name = 2;
+    google.protobuf.Timestamp created_at = 3;
+}
+
+// Create a new user
+message CreateUserRequest {
+    string name = 1;
+}
+
+// Create user response
+// Returns a JWT token used to validate the user
+message CreateUserResponse {
+    string token = 1;
+    User user = 2;
+}
+
+// Returns the current user
+message GetUserResponse {
+    User user = 1;
+}
+
+message EventUserUpdate {
+    EventMetadata metadata = 1;
+    User user = 2;
+}

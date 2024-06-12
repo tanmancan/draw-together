@@ -1,0 +1,26 @@
+syntax = "proto3";
+package model;
+
+import "proto/model/common.proto";
+
+option go_package = "github.com/tanmancan/draw-together/internal/model";
+
+message PointerPosition {
+    uint32 x = 1;
+    uint32 y = 2;
+}
+
+message EventPointerUpdate {
+    EventMetadata metadata = 1;
+    repeated PointerPosition pointer_positions = 5;
+}
+
+// Send pointer movements to the server
+message UpdatePointerRequest {
+    UUID board_id = 1;
+    repeated PointerPosition pointer_positions = 2;
+}
+
+message UpdatePointerResponse {
+    bool success = 1;
+}

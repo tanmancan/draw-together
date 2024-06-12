@@ -1,0 +1,47 @@
+syntax = "proto3";
+package model;
+
+import "proto/model/common.proto";
+
+option go_package = "github.com/tanmancan/draw-together/internal/model";
+
+message ImageData {
+    bytes data = 4;
+}
+
+message EventDrawingUpdate {
+    EventMetadata metadata = 1;
+    ImageData image_data = 2;
+}
+
+message EventDrawingDetectQueue {
+    EventMetadata metadata = 1;
+    UUID board_id = 2;
+}
+
+message EventDrawingDetect {
+    EventMetadata metadata = 1;
+    string description = 2;
+}
+
+message UpdateDrawingRequest {
+    UUID board_id = 1;
+    ImageData image_data = 3;
+}
+
+message UpdateDrawingResponse {
+    bool success = 1;
+}
+
+message GetBoardDrawingsRequest {
+    UUID board_id = 1;
+}
+
+message GetBoardDrawingsResponse {
+    // map<userUUID, ImageData>
+    map<string, ImageData> drawings = 1;
+}
+
+message DrawingDetectResponse {
+    bool success = 1;
+}

@@ -1,0 +1,32 @@
+syntax = "proto3";
+package model;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/tanmancan/draw-together/internal/model";
+
+message UUID {
+    // A string representation of UUID
+    // value = "08f0097e-9d04-49bf-a92d-1ed8e1d95329"
+    string value = 1;
+}
+
+message EventMetadata {
+    // Event ID
+    UUID id = 1;
+    // Board ID
+    UUID board_id = 2;
+    // Sender User ID
+    UUID sender_id = 3;
+    // When message was created in system
+    google.protobuf.Timestamp created_at = 4;
+    // Message recipient
+    oneof target {
+        // Sent to all users in the board
+        bool all_users = 5;
+        // Sent only to specified user
+        UUID user_id = 6;
+        // Sent to all but the sender
+        bool all_but_sender = 7;
+    }
+}

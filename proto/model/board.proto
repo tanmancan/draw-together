@@ -1,0 +1,39 @@
+syntax = "proto3";
+package model;
+
+import "proto/model/common.proto";
+import "proto/model/user.proto";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/tanmancan/draw-together/internal/model";
+
+message Board {
+    // Board ID - UUID
+    UUID id = 1;
+    // Board name
+    string name = 2;
+    // Board owner
+    User owner = 3;
+    // Board users
+    repeated User board_users = 4;
+    // Time board was created in system
+    google.protobuf.Timestamp created_at = 5;
+}
+
+message CreateBoardRequest {
+    string name = 1;
+}
+
+message GetBoardRequest {
+    UUID id = 1;
+}
+
+message GetBoardResponse {
+    Board board = 1;
+}
+
+message EventBoardUpdate {
+    EventMetadata metadata = 1;
+    Board board = 2;
+}
