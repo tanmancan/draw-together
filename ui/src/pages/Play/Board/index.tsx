@@ -61,7 +61,7 @@ import {
 import { Blockquote, Button, IconButton } from "@radix-ui/themes";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
 
-const ENABLE_DETECT = false;
+const ENABLE_DETECT = import.meta.env.VITE_ENABLE_DETECT ?? false;
 
 let pointerTid: number | null = null;
 

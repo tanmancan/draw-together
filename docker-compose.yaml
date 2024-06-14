@@ -25,6 +25,8 @@ services:
         reservations:
           cpus: '0.25'
           memory: 25M
+    environment:
+      - VITE_ENABLE_DETECT=${ENABLE_DETECT}
         
   redis:
     restart: always

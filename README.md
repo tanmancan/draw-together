@@ -1,6 +1,6 @@
 # draw-together
 
-Demo: https://draw-together.dev/
+Demo: https://draw-together.dev
 
 ## Quick-start using the command line tool
 
@@ -42,6 +42,8 @@ Generate `.env` file:
 If you want to use the Azure image detection service replace the following values in `.env`:
 
 ```conf
+# Set to true to enable detection feature
+ENABLE_DETECT=true
 # The Azure endpoint
 AZURE_CV_ENDPOINT="https://example.cognitiveservices.azure.com/computervision"
 # The API key
