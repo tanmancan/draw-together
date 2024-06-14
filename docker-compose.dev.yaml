@@ -7,8 +7,17 @@ services:
     image: ${APP_NAMESPACE}/uidev:${APP_VERSION}
     volumes:
       - ./ui/src/:/app/src/.
+      - ./ui/vite.config.ts:/app/vite.config.ts
     ports:
       - ${SERVICE_UI_PORT}:${SERVICE_UI_PORT}
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 2G
+        reservations:
+          cpus: '2'
+          memory: 1G
 
   websocket:
     image: ${APP_NAMESPACE}/websocketdev:${APP_VERSION}
@@ -17,6 +26,14 @@ services:
       - ./internal/:/app/internal/.
     ports:
       - ${SERVICE_WEBSOCKET_PORT}:${SERVICE_WEBSOCKET_PORT}
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '2'
+          memory: 1G
 
   rpc:
     image: ${APP_NAMESPACE}/rpcdev:${APP_VERSION}
@@ -25,12 +42,28 @@ services:
       - ./internal/:/app/internal/.
     ports:
       - ${SERVICE_GRPC_PORT}:${SERVICE_GRPC_PORT}
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '2'
+          memory: 1G
 
   detect:
     image: ${APP_NAMESPACE}/detectdev:${APP_VERSION}
     volumes:
       - ./cmd/detect/:/app/cmd/detect/.
       - ./internal/:/app/internal/.
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '2'
+          memory: 1G
   
   protobuild:
     image: ${APP_NAMESPACE}/protobuilddev:${APP_VERSION}
