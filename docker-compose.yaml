@@ -11,6 +11,14 @@ services:
     ports:
       - ${ENVOY_ADMIN_PORT}:${ENVOY_ADMIN_PORT}
       - ${ENVOY_PUBLIC_PORT}:${ENVOY_PUBLIC_PORT}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   ui:
     image: ${APP_NAMESPACE}/${SERVICE_UI}:${APP_VERSION}
@@ -89,6 +97,13 @@ services:
     deploy:
       mode: replicated
       replicas: ${SERVICE_DETECT_REPLICAS}
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     environment:
       - SERVICE_REDIS=${SERVICE_REDIS}
       - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
